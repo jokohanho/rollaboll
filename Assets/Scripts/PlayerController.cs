@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour {
 
     public float speed;
     public Text countText;
-    public Text winText;
+    public Text endText;
     public Text timerText;
     public int finalScore;
 
@@ -23,25 +23,30 @@ public class PlayerController : MonoBehaviour {
         rb = GetComponent<Rigidbody>();
         count = 0;
         SetCountText();
-        SetCurrentTime(); 
-        winText.text = "";
+        SetCurrentTime();
+        moveBall();
+        endText.text = "";
         startTimer = Time.time;
     }
 
     void FixedUpdate()
     {
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
-        
-        Vector3 movement = new Vector3 (moveHorizontal, 0.0f, moveVertical);
 
-        rb.AddForce(movement * speed);
+        moveBall();
 
         if (count != finalScore)
         {
             SetCurrentTime();
         }
       
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            SetEndText();
+        }
     }
 
     void OnTriggerEnter(Collider other)
@@ -58,7 +63,7 @@ public class PlayerController : MonoBehaviour {
         countText.text = "Count: " + count.ToString();
         if (count >= finalScore)
         {
-            winText.text = "You Win!";
+            SetEndText();
         }
     }
     void SetCurrentTime()
@@ -68,5 +73,26 @@ public class PlayerController : MonoBehaviour {
         string seconds = (t % 60).ToString();
 
         timerText.text = minutes + ":" + seconds;
+    }
+    void moveBall()
+    { 
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        float moveVertical = Input.GetAxis("Vertical");
+
+        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+
+        rb.AddForce(movement * speed);
+    }
+    void SetEndText()
+    {
+        
+        if (count == finalScore)
+        {
+            endText.text = "You Win!";
+        }
+        else
+        {
+            endText.text = "Game Over!";
+        }
     }
 }
